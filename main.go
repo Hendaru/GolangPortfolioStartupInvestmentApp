@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bwastartup/auth"
 	"bwastartup/handler"
 	"bwastartup/user"
 	"log"
@@ -20,7 +21,11 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
+	 authService := auth.NewService()
+
+	// fmt.Println(authService.GenerateToken(1001))
+
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	userService.SaveAvatar(5, "images/1-profile.png")
 
