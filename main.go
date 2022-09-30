@@ -36,18 +36,22 @@ func main() {
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
 
-	campaigns, _ := campaignService.FindCampaigns(8)
+	campaigns, _ := campaignService.GetCampaigns(8)
 	fmt.Println(len(campaigns))
 
 	//HANDLER
 	userHandler := handler.NewUserHandler(userService, authService)
-	userService.SaveAvatar(5, "images/1-profile.png")
+	campaignHandler := handler.NewCampaignHandler(campaignService)
+
+	// userService.SaveAvatar(5, "images/1-profile.png")
 	router :=gin.Default()
 	api := router.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 	api.POST("/avatars",authMiddleware(authService, userService), userHandler.UploadAvatar)
+
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	router.Run()
 	
 }
