@@ -6,7 +6,6 @@ import (
 	"bwastartup/handler"
 	"bwastartup/helper"
 	"bwastartup/user"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -34,8 +33,23 @@ func main() {
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
 
-	campaigns, _ := campaignService.GetCampaigns(8)
-	fmt.Println(len(campaigns))
+
+	input :=campaign.CreateCampaignInput{}
+	input.Name = "Pengalangan Dana Hore"
+	input.ShortDescription = "Short"
+	input.Description = "Loooooooong"
+	input.GoalAmount=10000000
+	input.Perks = "hadiah satu, dua, dan tiga"
+
+	inputUser, _ := userService.GetUserById(6)
+	input.User = inputUser
+	
+	_,err = campaignService.CreateCampaign(input)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	
 
 	//HANDLER
 	userHandler := handler.NewUserHandler(userService, authService)
