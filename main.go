@@ -24,48 +24,42 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	//REPOSITORY
+	//REPOSITORY YG BERHUBUNGAN DENGAN DB
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
 
-	//SERVICE
+	//SERVICE YG BERHUBUNGAN DENGAN VALIDASI
 	userService := user.NewService(userRepository)
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
 
 
-	input :=campaign.CreateCampaignInput{}
-	input.Name = "Pengalangan Dana Hore"
-	input.ShortDescription = "Short"
-	input.Description = "Loooooooong"
-	input.GoalAmount=10000000
-	input.Perks = "hadiah satu, dua, dan tiga"
-
-	inputUser, _ := userService.GetUserById(6)
-	input.User = inputUser
-	
-	_,err = campaignService.CreateCampaign(input)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
 	
 
-	//HANDLER
+	//HANDLER YG BERHUBUNGAN DENGAN RESPON EX : 200, 400, 404
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
+	//ROUTING
 	// userService.SaveAvatar(5, "images/1-profile.png")
 	router :=gin.Default()
 	router.Static("/images","./images")
+	//api version ex v1, v2 dll
 	api := router.Group("/api/v1")
+
+	//USER
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 	api.POST("/avatars",authMiddleware(authService, userService), userHandler.UploadAvatar)
 
+	//CAMPAIGN
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
+	api.POST("/campaigns",authMiddleware(authService, userService) ,campaignHandler.CreateCampaign)
+
+
+	//go run main.go
 	router.Run()
 	
 }

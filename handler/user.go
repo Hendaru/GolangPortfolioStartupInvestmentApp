@@ -22,6 +22,7 @@ func NewUserHandler(userService user.Service, authService auth.Service)*userHand
 func (h *userHandler) RegisterUser(c *gin.Context) {
 	
 	var input user.RegisterUserInput
+	//ShouldBindJSON untuk memasukan input dari User ex body request
 	err :=c.ShouldBindJSON(&input)
 	if err != nil {
 		errors:=helper.FormatValidationError(err)
@@ -134,7 +135,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context){
 	currentUser := c.MustGet("currentUser").(user.User)
 	userID := currentUser.ID
 	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
-
+	// karena := sudah di pake di atas jadi pake err =
 	err = c.SaveUploadedFile(file, path)
 		if err != nil {
 			data := gin.H{"is_uploaded":false}
