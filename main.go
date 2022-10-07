@@ -48,15 +48,15 @@ func main() {
 	api := router.Group("/api/v1")
 
 	//USER
-	api.POST("/users", userHandler.RegisterUser)
-	api.POST("/sessions", userHandler.Login)
-	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
-	api.POST("/avatars",authMiddleware(authService, userService), userHandler.UploadAvatar)
+	api.POST("/users", userHandler.RegisterUserHandler)
+	api.POST("/sessions", userHandler.LoginHandler)
+	api.POST("/email_checkers", userHandler.CheckEmailAvailabilityHandler)
+	api.POST("/avatars",authMiddleware(authService, userService), userHandler.UploadAvatarHandler)
 
 	//CAMPAIGN
-	api.GET("/campaigns", campaignHandler.GetCampaigns)
-	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
-	api.POST("/campaigns",authMiddleware(authService, userService) ,campaignHandler.CreateCampaign)
+	api.GET("/campaigns", campaignHandler.GetAllCampaignsHandler)
+	api.GET("/campaigns/:id", campaignHandler.GetCampaignHandler)
+	api.POST("/campaigns",authMiddleware(authService, userService) ,campaignHandler.CreateCampaignHandler)
 
 
 	//go run main.go
@@ -93,7 +93,7 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 		}
 		userID :=int(claim["user_id"].(float64))
 
-		user, err := userService.GetUserById(userID)
+		user, err := userService.GetUserByIdUserService(userID)
 		if err != nil {
 			response :=helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)

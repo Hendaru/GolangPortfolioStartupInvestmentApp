@@ -19,10 +19,10 @@ func NewCampaignHandler(service campaign.Service) *campaignHandler {
 }
 
 //api/v1/campaigns
-func(h *campaignHandler) GetCampaigns(c *gin.Context){
+func(h *campaignHandler) GetAllCampaignsHandler(c *gin.Context){
 	userID,_ := strconv.Atoi(c.Query("user_id"))
 
-	campaigns, err := h.service.GetCampaigns(userID)
+	campaigns, err := h.service.GetCampaignsService(userID)
 	if err != nil {
 		response := helper.APIResponse("Error to get campaign", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -32,7 +32,7 @@ func(h *campaignHandler) GetCampaigns(c *gin.Context){
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *campaignHandler) GetCampaign(c *gin.Context){
+func (h *campaignHandler) GetCampaignHandler(c *gin.Context){
 	var input campaign.GetCampaignDetailInput
 
 	err := c.ShouldBindUri(&input)
@@ -41,7 +41,7 @@ func (h *campaignHandler) GetCampaign(c *gin.Context){
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	campaignDetail, err:= h.service.GetCampaignByID(input)
+	campaignDetail, err:= h.service.GetCampaignByIDService(input)
 	if err != nil {
 		response := helper.APIResponse("Failed to get campaign", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -52,7 +52,7 @@ func (h *campaignHandler) GetCampaign(c *gin.Context){
 
 }
 
-func (h *campaignHandler) CreateCampaign(c *gin.Context){
+func (h *campaignHandler) CreateCampaignHandler(c *gin.Context){
 	var input campaign.CreateCampaignInput
 
 	err := c.ShouldBindJSON(&input)
@@ -69,7 +69,7 @@ func (h *campaignHandler) CreateCampaign(c *gin.Context){
 	currentUser := c.MustGet("currentUser").(user.User)
 	input.User = currentUser
 
-	newCampaign, err := h.service.CreateCampaign(input)
+	newCampaign, err := h.service.CreateCampaignService(input)
 	if err != nil {
 		response := helper.APIResponse("Failed to create campaign", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)

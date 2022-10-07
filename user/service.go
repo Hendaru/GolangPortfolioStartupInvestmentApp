@@ -7,11 +7,11 @@ import (
 )
 
 type Service interface {
-	RegisterUser(input RegisterUserInput)(User, error) 
-	Login(input LoginInput)(User, error)
-	IsEmailAvailable(input CheckEmailInput)(bool, error)
-	SaveAvatar(ID int, fileLocation string) (User, error)
-	GetUserById(ID int)(User, error)
+	RegisterUserService(input RegisterUserInput)(User, error) 
+	LoginUserService(input LoginInput)(User, error)
+	IsEmailAvailableUserService(input CheckEmailInput)(bool, error)
+	SaveAvatarUserService(ID int, fileLocation string) (User, error)
+	GetUserByIdUserService(ID int)(User, error)
 }
 
 type service struct {
@@ -22,7 +22,7 @@ func  NewService(repository Repository) *service {
 	return &service{repository}
 }
 
-func (s *service) RegisterUser(input RegisterUserInput)(User, error){
+func (s *service) RegisterUserService(input RegisterUserInput)(User, error){
 	user := User{}
 	user.Name = input.Name
 	user.Email = input.Email
@@ -36,18 +36,18 @@ func (s *service) RegisterUser(input RegisterUserInput)(User, error){
 	user.PasswordHash = string(passwordHash)
 	user.Role = "user"
 
-	newUser, err := s.repository.Save(user)
+	newUser, err := s.repository.SaveUserRepository(user)
 	if err != nil {
 		return newUser, err
 	}
 	return newUser, nil
 }
 
-func (s *service) Login(input LoginInput) (User, error) {
+func (s *service) LoginUserService(input LoginInput) (User, error) {
 	email := input.Email
 	password := input.Password
 
-	user, err := s.repository.FindByEmail(email)
+	user, err := s.repository.FindByEmailUserRepository(email)
 	if err != nil {
 		return user, err
 	}
@@ -64,9 +64,9 @@ func (s *service) Login(input LoginInput) (User, error) {
 
 }
 
-func (s *service) IsEmailAvailable(input CheckEmailInput)(bool, error){
+func (s *service) IsEmailAvailableUserService(input CheckEmailInput)(bool, error){
 	email := input.Email
-	user, err := s.repository.FindByEmail(email)
+	user, err := s.repository.FindByEmailUserRepository(email)
 	if err != nil {
 		
 		return false, err
@@ -78,14 +78,14 @@ func (s *service) IsEmailAvailable(input CheckEmailInput)(bool, error){
 
 }
  
-func (s *service) SaveAvatar(ID int, fileLocation string) (User, error) {
-	user, err := s.repository.FindByID(ID)
+func (s *service) SaveAvatarUserService(ID int, fileLocation string) (User, error) {
+	user, err := s.repository.FindByIDUserRepository(ID)
 	if err != nil {
 		return user, err
 	}
 
 	user.AvatarFileName =fileLocation
-	updatedUser,err := s.repository.Update(user)
+	updatedUser,err := s.repository.UpdateUserRepository(user)
 	if err != nil {
 		return updatedUser, err
 	}
@@ -94,8 +94,8 @@ func (s *service) SaveAvatar(ID int, fileLocation string) (User, error) {
 
 }
 
-func (s *service) GetUserById(ID int)(User, error){
-	user,err := s.repository.FindByID(ID)
+func (s *service) GetUserByIdUserService(ID int)(User, error){
+	user,err := s.repository.FindByIDUserRepository(ID)
 	if err != nil {
 		return user, err
 	}

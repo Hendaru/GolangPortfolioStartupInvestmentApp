@@ -3,10 +3,11 @@ package campaign
 import "gorm.io/gorm"
 
 type Repository interface{
-	FindAll() ([]Campaign, error)
-	FindByUserID(UserID int) ([]Campaign, error)
-	FindByID(ID int)(Campaign, error)
-	SaveCampaign(campaign Campaign) (Campaign, error)
+	FindAllCampaignRepository() ([]Campaign, error)
+	FindByUserIDCampaignRepository(UserID int) ([]Campaign, error)
+	FindByIDCampaignRepository(ID int)(Campaign, error)
+	SaveCampaignRepository(campaign Campaign) (Campaign, error)
+	UpdateCampaignRepository(campaign Campaign) (Campaign , error)
 }
 
 type repository struct {
@@ -17,7 +18,7 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindAll() ([]Campaign, error) {
+func (r *repository) FindAllCampaignRepository() ([]Campaign, error) {
 	var campaigns []Campaign
 
 	err := r.db.Preload("CampaignImages", "campaign_images.is_primary = 1").Find(&campaigns).Error
@@ -27,7 +28,7 @@ func (r *repository) FindAll() ([]Campaign, error) {
 	return campaigns, nil
 }
 
-func (r *repository) FindByUserID(userID int)([]Campaign, error){
+func (r *repository) FindByUserIDCampaignRepository(userID int)([]Campaign, error){
 	var campaigns []Campaign
 	err := r.db.Where("user_id = ?", userID).Preload("CampaignImages", "campaign_images.is_primary = 1").Find(&campaigns).Error
 	if err != nil {
@@ -36,7 +37,7 @@ func (r *repository) FindByUserID(userID int)([]Campaign, error){
 	return campaigns, nil
 }
 
-func (r *repository) FindByID(ID int) (Campaign, error){
+func (r *repository) FindByIDCampaignRepository(ID int) (Campaign, error){
 	var campaign Campaign
 
 	err := r.db.Preload("User").Preload("CampaignImages").Where("id = ?", ID).Find(&campaign).Error
@@ -46,8 +47,16 @@ func (r *repository) FindByID(ID int) (Campaign, error){
 	return campaign, nil
 }
 
-func (r *repository) SaveCampaign(campaign Campaign) (Campaign, error) {
+func (r *repository) SaveCampaignRepository(campaign Campaign) (Campaign, error) {
 	err := r.db.Create(&campaign).Error
+	if err != nil {
+		return campaign, err
+	}
+	return campaign, nil
+}
+
+func (r *repository) UpdateCampaignRepository(campaign Campaign) (Campaign, error) {
+	err :=r.db.Save(&campaign).Error
 	if err != nil {
 		return campaign, err
 	}

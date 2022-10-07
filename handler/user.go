@@ -19,7 +19,7 @@ func NewUserHandler(userService user.Service, authService auth.Service)*userHand
 	return &userHandler{userService, authService}
 }
 
-func (h *userHandler) RegisterUser(c *gin.Context) {
+func (h *userHandler) RegisterUserHandler(c *gin.Context) {
 	
 	var input user.RegisterUserInput
 	//ShouldBindJSON untuk memasukan input dari User ex body request
@@ -32,7 +32,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	newUser, err :=h.userService.RegisterUser(input)
+	newUser, err :=h.userService.RegisterUserService(input)
 	if err != nil {
 		errors:=helper.FormatValidationError(err)
 		errorMessage := gin.H{"errros": errors}
@@ -53,7 +53,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusOK,response)
 }
 
-func (h *userHandler)Login(c *gin.Context) {
+func (h *userHandler)LoginHandler(c *gin.Context) {
 	var input user.LoginInput
 	err :=c.ShouldBindJSON(&input)
 	if err != nil {
@@ -64,7 +64,7 @@ func (h *userHandler)Login(c *gin.Context) {
 		return
 	}
 
-	loggedinUser, err := h.userService.Login(input)
+	loggedinUser, err := h.userService.LoginUserService(input)
 
 	if err != nil {
 		errorMessage := gin.H{"errros": err.Error()}
@@ -87,7 +87,7 @@ func (h *userHandler)Login(c *gin.Context) {
 
 }
 
-func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
+func (h *userHandler) CheckEmailAvailabilityHandler(c *gin.Context) {
 	var input user.CheckEmailInput
 
 	err := c.ShouldBindJSON(&input)
@@ -98,7 +98,7 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
-	IsEmailAvailable, err := h.userService.IsEmailAvailable(input)
+	IsEmailAvailable, err := h.userService.IsEmailAvailableUserService(input)
 
 	if err != nil {
 		errorMessage := gin.H{"errros": "Server error"}
@@ -122,7 +122,7 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *userHandler) UploadAvatar(c *gin.Context){
+func (h *userHandler) UploadAvatarHandler(c *gin.Context){
 	
 	file, err := c.FormFile("avatar")
 	if err != nil {
@@ -147,7 +147,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context){
 	
 
 
-	_, err =  h.userService.SaveAvatar(userID, path)
+	_, err =  h.userService.SaveAvatarUserService(userID, path)
 	if err != nil {
 		data := gin.H{"is_uploaded":false}
 		response := helper.APIResponse("Failed to uplod avatar image", http.StatusBadRequest, "error", data)
