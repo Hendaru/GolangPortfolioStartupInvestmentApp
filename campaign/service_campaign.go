@@ -1,6 +1,7 @@
 package campaign
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gosimple/slug"
@@ -70,6 +71,10 @@ func (s *service) UpdateCampaignService(inputID GetCampaignDetailInput, inputDat
 
 	if err != nil {
 		return campaign, err
+	}
+
+	if campaign.UserID != inputData.User.ID{
+		return campaign, errors.New("Not an owner of the campaign")
 	}
 
 	campaign.Name = inputData.Name

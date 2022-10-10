@@ -57,6 +57,7 @@ func main() {
 	api.GET("/campaigns", campaignHandler.GetAllCampaignsHandler)
 	api.GET("/campaigns/:id", campaignHandler.GetCampaignHandler)
 	api.POST("/campaigns",authMiddleware(authService, userService) ,campaignHandler.CreateCampaignHandler)
+	api.PUT("/campaigns/:id",authMiddleware(authService, userService) ,campaignHandler.UpdateCampaignHandler)
 
 
 	//go run main.go
