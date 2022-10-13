@@ -5,6 +5,7 @@ import (
 	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
+	"bwastartup/transaction"
 	"bwastartup/user"
 	"log"
 	"net/http"
@@ -27,23 +28,23 @@ func main() {
 	//REPOSITORY YG BERHUBUNGAN DENGAN DB
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
+	transactionRepository := transaction.NewRepository(db)
 
 	//SERVICE YG BERHUBUNGAN DENGAN VALIDASI
 	userService := user.NewService(userRepository)
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
-
-
-	
+	transactionService := transaction.NewService(transactionRepository, campaignRepository)
 
 	//HANDLER YG BERHUBUNGAN DENGAN RESPON EX : 200, 400, 404
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	//ROUTING
 	// userService.SaveAvatar(5, "images/1-profile.png")
-	router :=gin.Default()
-	router.Static("/images","./images")
+	router := gin.Default()
+	router.Static("/images", "./images")
 	//api version ex v1, v2 dll
 	api := router.Group("/api/v1")
 
@@ -51,36 +52,39 @@ func main() {
 	api.POST("/users", userHandler.RegisterUserHandler)
 	api.POST("/sessions", userHandler.LoginHandler)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailabilityHandler)
-	api.POST("/avatars",authMiddleware(authService, userService), userHandler.UploadAvatarHandler)
+	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatarHandler)
 
 	//CAMPAIGN
 	api.GET("/campaigns", campaignHandler.GetAllCampaignsHandler)
 	api.GET("/campaigns/:id", campaignHandler.GetCampaignHandler)
-	api.POST("/campaigns",authMiddleware(authService, userService) ,campaignHandler.CreateCampaignHandler)
-	api.PUT("/campaigns/:id",authMiddleware(authService, userService) ,campaignHandler.UpdateCampaignHandler)
-	api.POST("/campaign-image",authMiddleware(authService, userService) ,campaignHandler.UploadCampaignImageHandler)
+	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaignHandler)
+	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaignHandler)
+	api.POST("/campaign-image", authMiddleware(authService, userService), campaignHandler.UploadCampaignImageHandler)
+
+	//TRANSACTION
+	api.GET("/campaign/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransactionHandler)
 
 	//go run main.go
 	router.Run()
-	
+
 }
 
-func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc{
+func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
-		if !strings.Contains(authHeader, "Bearer"){
-			response :=helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+		if !strings.Contains(authHeader, "Bearer") {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
 		tokenString := ""
 		arrayToken := strings.Split(authHeader, " ")
-		if len(arrayToken)== 2{
+		if len(arrayToken) == 2 {
 			tokenString = arrayToken[1]
 		}
 		token, err := authService.ValidateToken(tokenString)
-		if err != nil{
-			response :=helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+		if err != nil {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -88,22 +92,19 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 		claim, ok := token.Claims.(jwt.MapClaims)
 
 		if !ok || !token.Valid {
-			response :=helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
-		userID :=int(claim["user_id"].(float64))
+		userID := int(claim["user_id"].(float64))
 
 		user, err := userService.GetUserByIdUserService(userID)
 		if err != nil {
-			response :=helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
 		c.Set("currentUser", user)
-	
+
 	}
 }
-
-
-
