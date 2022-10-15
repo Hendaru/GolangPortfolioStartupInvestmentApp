@@ -63,6 +63,7 @@ func main() {
 
 	//TRANSACTION
 	api.GET("/campaign/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransactionHandler)
+	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactionSHandler)
 
 	//go run main.go
 	router.Run()

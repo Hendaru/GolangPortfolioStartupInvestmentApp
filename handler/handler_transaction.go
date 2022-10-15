@@ -4,6 +4,7 @@ import (
 	"bwastartup/helper"
 	"bwastartup/transaction"
 	"bwastartup/user"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -38,6 +39,27 @@ func (h *transactionHandler) GetCampaignTransactionHandler(c *gin.Context) {
 	}
 
 	response := helper.APIResponse("Success to get campaign's trsnsactions", http.StatusOK, "success", transaction.FormatCampaignTransactionS(transactionS))
+	c.JSON(http.StatusOK, response)
+
+}
+
+func (h *transactionHandler) GetUserTransactionSHandler(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := currentUser.ID
+
+	transactionS, err := h.service.GetTransactionByUserIDService(userID)
+	if err != nil {
+		response := helper.APIResponse("Failed to get user transactions ", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+
+	}
+	// fmt.Println(transactionS)
+	for _, t := range transactionS {
+		fmt.Println(t.Campaign.ID)
+	}
+
+	response := helper.APIResponse("Success to get User trsnsactions", http.StatusOK, "success", transaction.FormatUserTransactionS(transactionS))
 	c.JSON(http.StatusOK, response)
 
 }
