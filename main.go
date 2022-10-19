@@ -5,6 +5,7 @@ import (
 	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
+	"bwastartup/payment"
 	"bwastartup/transaction"
 	"bwastartup/user"
 	"log"
@@ -34,7 +35,8 @@ func main() {
 	userService := user.NewService(userRepository)
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
-	transactionService := transaction.NewService(transactionRepository, campaignRepository)
+	paymentService := payment.NewService()
+	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	//HANDLER YG BERHUBUNGAN DENGAN RESPON EX : 200, 400, 404
 	userHandler := handler.NewUserHandler(userService, authService)
@@ -64,6 +66,7 @@ func main() {
 	//TRANSACTION
 	api.GET("/campaign/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransactionHandler)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactionSHandler)
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransactionHandler)
 
 	//go run main.go
 	router.Run()
