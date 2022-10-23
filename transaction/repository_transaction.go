@@ -9,6 +9,7 @@ type repository struct {
 type Repository interface {
 	GetByCampaignIDRepository(campaignID int) ([]Transaction, error)
 	GetByUserIDTransactionRepository(userID int) ([]Transaction, error)
+	GetByIDTransactionRepository(ID int) (Transaction, error)
 	SaveTransactionRepository(transaction Transaction) (Transaction, error)
 	UpdateTransactionRepository(transaction Transaction) (Transaction, error)
 }
@@ -42,6 +43,19 @@ func (r *repository) GetByUserIDTransactionRepository(userID int) ([]Transaction
 	}
 
 	return transactionS, nil
+}
+
+func (r *repository) GetByIDTransactionRepository(ID int) (Transaction, error) {
+	var transaction Transaction
+
+	// CARA MENGHUBUNGKAN RELASI DATABASE YG TIDAK PUNYA RELASI LANGSUNG
+	err := r.db.Where("id=?", ID).Find(&transaction).Error
+
+	if err != nil {
+		return transaction, err
+	}
+
+	return transaction, nil
 }
 
 func (r *repository) SaveTransactionRepository(transaction Transaction) (Transaction, error) {

@@ -13,7 +13,9 @@ import (
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -46,6 +48,7 @@ func main() {
 	//ROUTING
 	// userService.SaveAvatar(5, "images/1-profile.png")
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Static("/images", "./images")
 	//api version ex v1, v2 dll
 	api := router.Group("/api/v1")
@@ -55,6 +58,7 @@ func main() {
 	api.POST("/sessions", userHandler.LoginHandler)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailabilityHandler)
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatarHandler)
+	api.POST("/user/fetch", authMiddleware(authService, userService), userHandler.FetchUser)
 
 	//CAMPAIGN
 	api.GET("/campaigns", campaignHandler.GetAllCampaignsHandler)
@@ -67,6 +71,7 @@ func main() {
 	api.GET("/campaign/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransactionHandler)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactionSHandler)
 	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransactionHandler)
+	api.POST("/transactions/notification", authMiddleware(authService, userService), transactionHandler.GetNotificationTransactionHandler)
 
 	//go run main.go
 	router.Run()

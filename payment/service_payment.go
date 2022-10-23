@@ -7,7 +7,8 @@ import (
 	"github.com/veritrans/go-midtrans"
 )
 
-type service struct{}
+type service struct {
+}
 
 type Service interface {
 	GetPaymentURLService(transaction TransactionEntityPayment, user user.User) (string, error)
