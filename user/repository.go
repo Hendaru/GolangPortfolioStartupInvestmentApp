@@ -1,13 +1,16 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
-type Repository interface{
-	SaveUserRepository(user User)( User, error)
+type Repository interface {
+	SaveUserRepository(user User) (User, error)
 	FindByEmailUserRepository(email string) (User, error)
-	FindByIDUserRepository(ID int)(User, error)
-	UpdateUserRepository(user User)(User, error)
+	FindByIDUserRepository(ID int) (User, error)
+	UpdateUserRepository(user User) (User, error)
 }
+
 type repository struct {
 	db *gorm.DB
 }
@@ -16,7 +19,7 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) SaveUserRepository(user User) (User, error){
+func (r *repository) SaveUserRepository(user User) (User, error) {
 	err := r.db.Create(&user).Error
 	if err != nil {
 		return user, err
@@ -45,7 +48,7 @@ func (r *repository) FindByIDUserRepository(ID int) (User, error) {
 }
 
 func (r *repository) UpdateUserRepository(user User) (User, error) {
-	err:=r.db.Save(&user).Error
+	err := r.db.Save(&user).Error
 	if err != nil {
 		return user, err
 	}

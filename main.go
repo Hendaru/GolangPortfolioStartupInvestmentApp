@@ -21,7 +21,34 @@ import (
 )
 
 func main() {
-	dsn := "root:root@tcp(127.0.0.1:8889)/bwstartup?charset=utf8mb4&parseTime=True&loc=Local"
+
+	// username := os.Getenv("MYSQL_USER")
+
+	// password := os.Getenv("MYSQL_ROOT_PASSWORD")
+
+	// host := os.Getenv("MYSQL_HOST")
+
+	// port := os.Getenv("MYSQL_PORT")
+
+	// schema := os.Getenv("MYSQL_DATABASE")
+
+	// dataSourceName := fmt.Sprintf(
+
+	// 	"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+
+	// 	username,
+
+	// 	password,
+
+	// 	host,
+
+	// 	port,
+
+	// 	schema,
+	// )
+
+	dsn := "hore:hore@tcp(host.docker.internal:3306)/bwstartup?charset=utf8mb4&parseTime=True&loc=Local"
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
