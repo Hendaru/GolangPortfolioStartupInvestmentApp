@@ -4,7 +4,7 @@ default:
 
 up: default
 	@echo "=============starting api locally============="
-	docker-compose up -d
+	docker-compose up 
 
 logs:
 	docker-compose logs -f
