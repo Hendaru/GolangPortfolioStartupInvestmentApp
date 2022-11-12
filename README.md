@@ -4,7 +4,7 @@
 - docker-compose up
 
 **Documentation**
-- localhost:8080/api/v1/users
+- POST : localhost:8080/api/v1/users
   body : 
   ```json 
     {
@@ -12,14 +12,20 @@
     "occupation":"Programmer",
     "email":"hendaru@gmail.com",
     "password":"123456"
-}
-  ```
+} ```
 
-- localhost:8080/api/v1/sessions
+-POST : localhost:8080/api/v1/sessions 
   body:
   ```json
     {
     "email":"hendaru@gmail.com",
     "password":"123456"
-}
-  ```
+}```
+
+-POST : localhost:8080/api/v1/email_checkers
+body:
+```json
+{
+    "email":"hendaru@gmail.com"
+}```
+
