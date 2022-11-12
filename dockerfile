@@ -8,8 +8,6 @@ COPY . .
 # RUN go build -o bwa-backend
 RUN go install -mod=mod github.com/githubnemo/CompileDaemon
 
-
-
 ENTRYPOINT CompileDaemon -log-prefix=false -build="go build main.go" -command="./main"
 
 # EXPOSE 8080
